@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 # coding: utf-8
 # Copyright 2016 Abram Hindle, https://github.com/tywtyw2002, and https://github.com/treedust
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,25 +33,30 @@ class HTTPResponse(object):
         self.body = body
 
 class HTTPClient(object):
-    #def get_host_port(self,url):
+    def get_host_port(self,url):
+        purl = urlparse(url)
+        return (purl.hostname, purl.port)
 
     def connect(self, host, port):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.connect((host, port))
-        return None
+        data = self.recvall(self.socket)
+        print("DATA = ", data)
+        return data
 
     def get_code(self, data):
-        return None
 
-    def get_headers(self,data):
-        return None
+        return None #return code
+
+    def get_headers(self, data):
+        return None #return headers
 
     def get_body(self, data):
-        return None
-    
+        return None #return body
+
     def sendall(self, data):
         self.socket.sendall(data.encode('utf-8'))
-        
+
     def close(self):
         self.socket.close()
 
@@ -70,6 +75,14 @@ class HTTPClient(object):
     def GET(self, url, args=None):
         code = 500
         body = ""
+        response = ""
+		#parse url
+        purl = urlparse(url)
+		#check scheme
+		if(purl.scheme == "http"):
+			#DO MORE stuff
+            self.connect(self.get_host_port(url))
+        self.sendall(response)
         return HTTPResponse(code, body)
 
     def POST(self, url, args=None):
@@ -82,7 +95,7 @@ class HTTPClient(object):
             return self.POST( url, args )
         else:
             return self.GET( url, args )
-    
+
 if __name__ == "__main__":
     client = HTTPClient()
     command = "GET"
