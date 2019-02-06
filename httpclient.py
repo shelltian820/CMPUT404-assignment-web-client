@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # coding: utf-8
-# Copyright 2016 Abram Hindle, https://github.com/tywtyw2002, and https://github.com/treedust
+# Copyright 2019 Shelley Tian, Abram Hindle, https://github.com/tywtyw2002, and https://github.com/treedust
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import socket
 import re
 # you may use urllib to encode data appropriately
 import urllib.parse
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urlencode
 
 def help():
     print("httpclient.py [GET/POST] [URL]\n")
@@ -51,8 +51,6 @@ class HTTPClient(object):
 
     def get_code(self, data):
         code = data.split('\r\n')[0].split(' ')[1]
-        # headers = self.get_headers(data)
-        # code = headers.split('\r\n')[0].split(' ')[1]
         # print("****CODE:" , code)
         return int(code)
 
@@ -84,7 +82,7 @@ class HTTPClient(object):
                 buffer.extend(part)
             else:
                 done = not part
-        print("BUFFER: <<\n", buffer, ">>\n")
+        # print("BUFFER: <<\n", buffer, ">>\n")
         return buffer.decode('utf-8')
 
     def GET(self, url, args=None):
@@ -118,8 +116,8 @@ class HTTPClient(object):
             response = self.recvall(self.socket)
             code = self.get_code(response)
             body = self.get_body(response)
-            print("CODE:\n", code)
-            print("BODY:\n", body)
+            # print("CODE:\n", code)
+            # print("BODY:\n", body)
         except Exception as e:
             print(e)
             code = 500
@@ -133,7 +131,9 @@ class HTTPClient(object):
     def POST(self, url, args=None):
         code = 500
         body = ""
-        post_data = str(args)
+        post_data = ""
+        if(args != None):
+            post_data = urlencode(args)
 
         #parse url
         purl = urlparse(url)
@@ -150,7 +150,7 @@ class HTTPClient(object):
         else:
             request = 'POST ' + purl.path + ' HTTP/1.1\r\n'
         request += ('Host: ' + purl.hostname + "\r\n")
-        request += ('Accept: */*\r\n')
+        request += ('Content-Type: application/x-www-form-urlencoded\r\n')
         request += ('Content-Length: ' + str(len(post_data)) + '\r\n')
         request += ('Connection: Close\r\n\r\n')
         request += (post_data + '\r\n\r\n')
@@ -164,8 +164,8 @@ class HTTPClient(object):
             response = self.recvall(self.socket)
             code = self.get_code(response)
             body = self.get_body(response)
-            print("CODE:\n", code)
-            print("BODY:\n", body)
+            # print("CODE:\n", code)
+            # print("BODY:\n", body)
         except Exception as e:
             print(e)
             code = 500
