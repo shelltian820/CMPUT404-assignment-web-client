@@ -154,7 +154,7 @@ class HTTPClient(object):
         request += ('Content-Length: ' + str(len(post_data)) + '\r\n')
         request += ('Connection: Close\r\n\r\n')
         request += (post_data + '\r\n\r\n')
-        print("REQUEST:\n", request, "---")
+        print(request)
 
         #send request
         self.sendall(request)
